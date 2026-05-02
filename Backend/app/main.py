@@ -1,9 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from contextlib import asynccontextmanager
-from app.core.database_helper import db_helper
 
-from app.api.deps import get_db
-from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database_helper import db_helper, get_db
+from app.core.config import settings
+
+from sqlalchemy import text, select
+
+from app.models.business import Business
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,13 +17,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.get("/health/db")
-async def health_db():
-    async with get_db() as db:
-        result = await db.execute(text("SELECT 1"))
-        value = result.scalar()
-
-        return {
-            "status": "ok" if value == 1 else "error",
-            "db": "connected"
-        }
+@app.get("/health")
+async def health(db: AsyncSession = Depends(get_db)):
+    await db.execute(text("SELECT 1"))
+    return {"status": "ok"}

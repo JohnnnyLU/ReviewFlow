@@ -15,7 +15,7 @@ fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 def run_migrations_offline():
-    url = settings.SYNC_DB_URL
+    url = settings.sync_db_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -30,7 +30,7 @@ def run_migrations_offline():
 
 def run_migrations_online():
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = settings.SYNC_DB_URL
+    configuration["sqlalchemy.url"] = settings.sync_db_url
 
     connectable = engine_from_config(
         configuration,

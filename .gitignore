@@ -17,7 +17,7 @@ coverage
 *.tsbuildinfo
 
 # Env files
-.env
+Backend/.env
 .env.*
 !.env.example
 

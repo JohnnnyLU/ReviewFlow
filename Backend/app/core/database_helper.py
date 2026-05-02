@@ -5,12 +5,8 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
 class DatabaseHelper:
-    def __init__(
-        self,
-        url: str,
-        echo: bool = True
-    ):
-        self.engine: AsyncEngine = create_async_engine(
+    def __init__(self, url: str, echo: bool = True):
+        self.engine = create_async_engine(
             url=url,
             echo=echo,
         )
@@ -32,5 +28,7 @@ class Base(DeclarativeBase):
     pass
 
 db_helper = DatabaseHelper(
-    url=settings.DB_URL,
+    url=settings.db_url,
 )
+
+get_db = db_helper.get_scoped_session
