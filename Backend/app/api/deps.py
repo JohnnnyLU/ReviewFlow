@@ -1,6 +1,22 @@
+from fastapi import Depends
+
 from app.core.database_helper import db_helper
 
+from app.repositories import BusinessRepository
+
+from app.services import AuthService
 
 async def get_db():
-    async for session in db_helper.get_session():
-        yield session
+    return db_helper.get_scoped_session()
+
+#repositories
+
+def get_business_repositories() -> BusinessRepository:
+    return BusinessRepository()
+
+#services
+
+def get_auth_service(
+    business_repo: BusinessRepository = Depends(get_business_repositories)
+) -> AuthService:
+    return AuthService(business_repo)

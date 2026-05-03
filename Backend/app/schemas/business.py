@@ -7,19 +7,10 @@ from pydantic import (
     field_validator,
 )
 
-NAME_PATTERN = re.compile(r'[a-zA-Z]')
-
 class BusinessSchema(BaseModel):
     business_name:  str = Field(..., min_length=3, max_length=100)
     email: EmailStr
     password: str
-
-    @field_validator('business_name')
-    def validate_name(cls, v: str) -> str:
-        v = v.strip()
-        if not NAME_PATTERN.fullmatch(v):
-            raise ValueError("Name must contain only letters")
-        return v
 
     @field_validator('password')
     def validate_password(cls, v: str) -> str:
