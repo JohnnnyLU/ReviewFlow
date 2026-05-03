@@ -1,0 +1,38 @@
+import re
+
+from pydantic import (
+    BaseModel,
+    Field,
+    EmailStr,
+    field_validator,
+)
+
+NAME_PATTERN = re.compile(r'[a-zA-Z]')
+
+class BusinessSchema(BaseModel):
+    business_name:  str = Field(..., min_length=3, max_length=100)
+    email: EmailStr
+    password: str
+
+    @field_validator('business_name')
+    def validate_name(cls, v: str) -> str:
+        v = v.strip()
+        if not NAME_PATTERN.fullmatch(v):
+            raise ValueError("Name must contain only letters")
+        return v
+
+    @field_validator('password')
+    def validate_password(cls, v: str) -> str:
+        if not re.search(r'[a-zA-Z]', v):
+            raise ValueError('The password must contain Latin characters.')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('The password must contain at least one uppercase letter.')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('The password must contain at least one lowercase letter.')
+        if not re.search(r'\d', v):
+            raise ValueError('The password must contain at least one digit.')
+        if not re.search(r'[!@#$%^&*(),.?\':{}|<>]', v):
+            raise ValueError('The password must contain at least one special character.')
+        if ' ' in v:
+            raise ValueError('The password cannot contain spaces.')
+        return v
