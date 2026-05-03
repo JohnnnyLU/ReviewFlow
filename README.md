@@ -40,6 +40,7 @@ Backend:
 - JWT authentication
 
 Frontend:
+- React
 - Next.js
 - TypeScript
 - Tailwind CSS
