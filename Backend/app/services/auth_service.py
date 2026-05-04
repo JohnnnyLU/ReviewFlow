@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
@@ -6,10 +8,30 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Business
 from app.schemas import BusinessSchema
 from app.core.security import hash_password, verify_password
+from app.models import Business
+
+#jwt
+from jose import jwt
+
 
 class AuthService:
     def __init__(self, business_repo):
         self.business_repo = business_repo
+
+    async def authentificate(
+        self,
+        email: str,
+        password: str
+        session: AsyncSession,
+    ):
+        business = await self.business_repo.get_exist_business(session, email)
+        if not business or not verify_password(plain_password=password, hashed_password=business.password_hash)
+
+    def create_jwt_token(
+        self,
+        business: Business
+    ):
+        expiration = timedelta()
 
     async def register(
         self,

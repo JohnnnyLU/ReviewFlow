@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # DB models
 from app.models import Business
+from app.core.config import settings
+
 
 class BusinessRepository:
     async def get_exist_business(
@@ -24,6 +26,7 @@ class BusinessRepository:
         session.add(business)
         await session.commit()
         await session.refresh(business)
+        print(settings.db_url)
         print('COMMIT DONE')
         return business
 
