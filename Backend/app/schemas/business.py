@@ -10,7 +10,7 @@ from pydantic import (
 class BusinessSchema(BaseModel):
     business_name:  str = Field(..., min_length=3, max_length=100)
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=100)
 
     @field_validator('password')
     def validate_password(cls, v: str) -> str:
@@ -27,3 +27,7 @@ class BusinessSchema(BaseModel):
         if ' ' in v:
             raise ValueError('The password cannot contain spaces.')
         return v
+
+class LoginSchema(BaseModel):
+    email: EmailStr
+    password: str

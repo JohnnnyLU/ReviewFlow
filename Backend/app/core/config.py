@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_NAME: str
 
+    EXP_TIME: int
+    SECRET_KEY: str
+    ALGORITHM: str
+
     def _build_db_url(self, conn_type: str, host: str) -> str:
         return (
             f'postgresql+{conn_type}://'

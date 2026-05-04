@@ -1,18 +1,17 @@
-from datetime import timedelta
+from datetime import timedelta, datetime, UTC
 
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Business
+from app.core.config import settings
 from app.schemas import BusinessSchema
 from app.core.security import hash_password, verify_password
 from app.models import Business
 
 #jwt
 from jose import jwt
-
 
 class AuthService:
     def __init__(self, business_repo):
@@ -21,22 +20,34 @@ class AuthService:
     async def authentificate(
         self,
         email: str,
-        password: str
+        password: str,
         session: AsyncSession,
     ):
         business = await self.business_repo.get_exist_business(session, email)
-        if not business or not verify_password(plain_password=password, hashed_password=business.password_hash)
+        if not business or not verify_password(plain_password=password, hashed_password=business.password_hash):
+            raise ValueError('Invalid credentials')
+        return self.create_jwt_token(business)
 
     def create_jwt_token(
-        self,
-        business: Business
+            self,
+            business: Business
     ):
-        expiration = timedelta()
+        expiration = timedelta(hours=settings.EXP_TIME)
+        payload = {
+            'sub': business.id,
+            'exp': datetime.now(UTC) + expiration,
+        }
+        token = jwt.encode(
+            payload,
+            settings.SECRET_KEY,
+            settings.ALGORITHM,
+        )
+        return token
 
     async def register(
-        self,
-        session: AsyncSession,
-        business_schema: BusinessSchema,
+            self,
+            session: AsyncSession,
+            business_schema: BusinessSchema,
     ) -> Business:
         existing_business = await self.business_repo.get_exist_business(
             session, business_schema.email
