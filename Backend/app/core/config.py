@@ -1,7 +1,12 @@
 from pathlib import Path
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+class AuthJWT(BaseModel):
+    secret_key_path: Path = ...
+    algorithm: str = 'HS256'
 
 class Settings(BaseSettings):
     DB_HOST: str
@@ -10,10 +15,6 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
-
-    EXP_TIME: int
-    SECRET_KEY: str
-    ALGORITHM: str
 
     def _build_db_url(self, conn_type: str, host: str) -> str:
         return (
@@ -33,5 +34,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / '.env'
     )
+
+    auth_jwt: AuthJWT = AuthJWT()
 
 settings = Settings()

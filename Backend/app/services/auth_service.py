@@ -28,22 +28,6 @@ class AuthService:
             raise ValueError('Invalid credentials')
         return self.create_jwt_token(business)
 
-    def create_jwt_token(
-            self,
-            business: Business
-    ):
-        expiration = timedelta(hours=settings.EXP_TIME)
-        payload = {
-            'sub': business.id,
-            'exp': datetime.now(UTC) + expiration,
-        }
-        token = jwt.encode(
-            payload,
-            settings.SECRET_KEY,
-            settings.ALGORITHM,
-        )
-        return token
-
     async def register(
             self,
             session: AsyncSession,
