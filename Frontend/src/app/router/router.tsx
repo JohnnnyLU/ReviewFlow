@@ -10,55 +10,68 @@ import { CampaignsPage } from "@/pages/campaigns";
 import { SettingsPage } from "@/pages/settings";
 import { PublicFeedbackPage } from "@/pages/public-feedback";
 import { NotFoundPage } from "@/pages/not-found";
+
 import { DashboardLayout } from "@/widgets/dashboard-layout";
 
-import { routes } from "@/shared/constants";
+import { routes, relativeRoutes } from "@/shared/constants";
+import { RouteErrorPage } from "@/shared/ui/route-error-page";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
     path: routes.home,
-    element: <HomePage />,
-  },
-  {
-    path: routes.login,
-    element: <LoginPage />,
-  },
-  {
-    path: routes.register,
-    element: <RegisterPage />,
-  },
-  {
-    path: routes.dashboard,
-    element: <DashboardLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         index: true,
-        element: <DashboardPage />,
+        element: <HomePage />,
       },
       {
-        path: routes.customersRelative,
-        element: <CustomersPage />,
+        path: relativeRoutes.login,
+        element: <LoginPage />,
       },
       {
-        path: routes.feedbackRelative,
-        element: <FeedbackListPage />,
+        path: relativeRoutes.register,
+        element: <RegisterPage />,
       },
       {
-        path: routes.campaignsRelative,
-        element: <CampaignsPage />,
+        path: relativeRoutes.dashboard,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
+          {
+            path: relativeRoutes.customers,
+            element: <CustomersPage />,
+          },
+          {
+            path: relativeRoutes.feedback,
+            element: <FeedbackListPage />,
+          },
+          {
+            path: relativeRoutes.campaigns,
+            element: <CampaignsPage />,
+          },
+          {
+            path: relativeRoutes.settings,
+            element: <SettingsPage />,
+          },
+        ],
       },
       {
-        path: routes.settingsRelative,
-        element: <SettingsPage />,
+        path: relativeRoutes.publicFeedback,
+        element: <PublicFeedbackPage />,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
-  },
-  {
-    path: routes.publicFeedback,
-    element: <PublicFeedbackPage />,
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
   },
 ]);

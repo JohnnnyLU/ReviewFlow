@@ -1,10 +1,10 @@
+import type { ReactNode } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-
 import { queryClient } from "@/shared/api";
 
 type AppProvidersProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function AppProviders({ children }: AppProvidersProps) {

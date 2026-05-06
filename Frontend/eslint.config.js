@@ -34,4 +34,85 @@ export default defineConfig([
       "no-debugger": "warn",
     },
   },
+
+  {
+    files: ["src/shared/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/pages/*", "@/widgets/*", "@/features/*", "@/entities/*"],
+              message: "shared layer must not depend on app/pages/widgets/features/entities",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/entities/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/pages/*", "@/widgets/*", "@/features/*"],
+              message: "entities layer must not depend on app/pages/widgets/features",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/features/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/pages/*", "@/widgets/*"],
+              message: "features layer must not depend on app/pages/widgets",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/widgets/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*", "@/pages/*"],
+              message: "widgets layer must not depend on app/pages",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/pages/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/app/*"],
+              message: "pages layer must not depend on app layer",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
