@@ -9,23 +9,41 @@ from app.core.config import settings
 from app.schemas import BusinessSchema
 from app.core.security import hash_password, verify_password
 from app.models import Business
-from app.services import JWTService
+
+from .jwt_service import JWTService
+from app.repositories import BusinessRepository
+from app.schemas import TokenResponse
 
 
 class AuthService:
-    def __init__(self, business_repo):
+    def __init__(
+            self,
+            business_repo: BusinessRepository,
+            jwt_service: JWTService
+    ):
         self.business_repo = business_repo
+        self.jwt_service = jwt_service
 
-    async def authentificate(
+    async def login(
         self,
         email: str,
         password: str,
         session: AsyncSession,
     ):
         business = await self.business_repo.get_exist_business(session, email)
+
         if not business or not verify_password(plain_password=password, hashed_password=business.password_hash):
             raise ValueError('Invalid credentials')
-        return JWTService.decode_token(business)
+
+        payload = {"sub": str(business.id)}
+
+        access_token = self.jwt_service.create_access_token(payload)
+        refresh_token = self.jwt_service.create_refresh_token(payload)
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
 
     async def register(
             self,

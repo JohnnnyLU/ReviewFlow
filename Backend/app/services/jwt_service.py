@@ -1,4 +1,3 @@
-from app.models import Business
 from app.core.config import settings
 
 from jose import jwt, JWTError, ExpiredSignatureError
@@ -6,15 +5,16 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 
-
 class JWTService:
     def __init__(self):
-        self.algorithm = settings.auth_jwt.algorithm
-        self.secret_key = settings.auth_jwt.secret_key
+        self.algorithm = settings.JWT_ALGORITHM
+        self.secret_key = settings.JWT_SECRET_KEY
+        self.access_token_expire_minutes = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        self.refresh_token_expire_days = settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.auth_jwt.access_token_expire_minutes)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
 
         to_encode.update({
             "exp": expire,
@@ -25,7 +25,7 @@ class JWTService:
 
     def create_refresh_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(days=settings.auth_jwt.refresh_token_expire_days)
+        expire = datetime.now(timezone.utc) + timedelta(days=self.refresh_token_expire_days)
 
         to_encode.update({
             "exp": expire,

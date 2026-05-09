@@ -4,18 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # DB models
 from app.models import Business
-from app.core.config import settings
-
 
 class BusinessRepository:
     async def get_exist_business(
             self,
-            email: str,
             session: AsyncSession,
-) -> Business | None:
-        result = await session.execute(
-            select(Business).where(Business.email == email)
-        )
+            email: str,
+    ) -> Business | None:
+        result = await session.execute(select(Business).where(Business.email == email))
+
         return result.scalar_one_or_none()
 
     async def create(

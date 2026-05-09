@@ -42,3 +42,7 @@ Thumbs.db
 # AI
 Frontend/.codex/
 Frontend/.agents/
+
+# Cache
+__pycache__/
+*.pyc
