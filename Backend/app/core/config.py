@@ -1,7 +1,20 @@
 from pathlib import Path
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+class Auth(BaseModel):
+    # JWT
+    jwt_secret_key: str
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 14
+
+    # Google
+    google_client_id: str
+    google_client_secret: str
+    google_redirect_uri: str
 
 class Settings(BaseSettings):
     DB_HOST: str
@@ -10,10 +23,6 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
-
-    EXP_TIME: int
-    SECRET_KEY: str
-    ALGORITHM: str
 
     def _build_db_url(self, conn_type: str, host: str) -> str:
         return (
@@ -33,5 +42,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / '.env'
     )
+
+    auth_jwt: Auth = Auth()
 
 settings = Settings()

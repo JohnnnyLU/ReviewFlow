@@ -9,9 +9,8 @@ from app.core.config import settings
 from app.schemas import BusinessSchema
 from app.core.security import hash_password, verify_password
 from app.models import Business
+from app.services import JWTService
 
-#jwt
-from jose import jwt
 
 class AuthService:
     def __init__(self, business_repo):
@@ -26,23 +25,7 @@ class AuthService:
         business = await self.business_repo.get_exist_business(session, email)
         if not business or not verify_password(plain_password=password, hashed_password=business.password_hash):
             raise ValueError('Invalid credentials')
-        return self.create_jwt_token(business)
-
-    def create_jwt_token(
-            self,
-            business: Business
-    ):
-        expiration = timedelta(hours=settings.EXP_TIME)
-        payload = {
-            'sub': business.id,
-            'exp': datetime.now(UTC) + expiration,
-        }
-        token = jwt.encode(
-            payload,
-            settings.SECRET_KEY,
-            settings.ALGORITHM,
-        )
-        return token
+        return JWTService.decode_token(business)
 
     async def register(
             self,
