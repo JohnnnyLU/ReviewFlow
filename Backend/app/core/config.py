@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 14
 
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+
+    SESSION_MIDDLEWARE_SECRET_KEY: str
+
     def _build_db_url(self, conn_type: str, host: str) -> str:
         return (
             f'postgresql+{conn_type}://'
