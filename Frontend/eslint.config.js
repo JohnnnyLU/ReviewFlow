@@ -43,8 +43,15 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ["@/app/*", "@/pages/*", "@/widgets/*", "@/features/*", "@/entities/*"],
-              message: "shared layer must not depend on app/pages/widgets/features/entities",
+              group: [
+                "@/app/*",
+                "@/pages/*",
+                "@/widgets/*",
+                "@/features/*",
+                "@/entities/*",
+              ],
+              message:
+                "shared layer must not depend on app/pages/widgets/features/entities",
             },
           ],
         },

@@ -47,4 +47,5 @@ export const routeBuilders = {
 
 export type AppRoute = (typeof routes)[keyof typeof routes];
 export type RelativeRoute = (typeof relativeRoutes)[keyof typeof relativeRoutes];
-export type DashboardRelativeRoute = (typeof dashboardSegments)[keyof typeof dashboardSegments];
+export type DashboardRelativeRoute =
+  (typeof dashboardSegments)[keyof typeof dashboardSegments];

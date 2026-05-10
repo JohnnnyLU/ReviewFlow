@@ -19,7 +19,10 @@ export class HttpError extends Error {
   }
 }
 
-export async function httpClient<T>(endpoint: string, options: HttpClientOptions = {}): Promise<T> {
+export async function httpClient<T>(
+  endpoint: string,
+  options: HttpClientOptions = {},
+): Promise<T> {
   const { method = "GET", body, headers } = options;
 
   const isFormData = body instanceof FormData;
@@ -42,10 +45,18 @@ export async function httpClient<T>(endpoint: string, options: HttpClientOptions
   const isJson = contentType?.includes("application/json");
 
   const payload =
-    response.status === 204 ? undefined : isJson ? await response.json() : await response.text();
+    response.status === 204
+      ? undefined
+      : isJson
+        ? await response.json()
+        : await response.text();
 
   if (!response.ok) {
-    throw new HttpError(`Request failed with status ${response.status}`, response.status, payload);
+    throw new HttpError(
+      `Request failed with status ${response.status}`,
+      response.status,
+      payload,
+    );
   }
 
   return payload as T;

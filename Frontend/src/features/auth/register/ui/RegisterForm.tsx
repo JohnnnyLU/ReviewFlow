@@ -1,13 +1,19 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router";
 
 import googleIcon from "@/shared/assets/icons/Google_Favicon_2025.svg";
-import eyeOffIcon from "@/shared/assets/icons/eye-off.svg";
-import eyeIcon from "@/shared/assets/icons/eye.svg";
 import { routes } from "@/shared/constants";
 import { cn } from "@/shared/lib";
 import { Button, Card, Input } from "@/shared/ui";
+
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  registerSchema,
+  type RegisterFormValues,
+} from "@/features/auth/register/model/registerSchema";
+import { FieldError, PasswordField } from "@/features/auth/ui";
 
 const businessTypeOptions = [
   { value: "", label: "Выберите тип бизнеса" },
@@ -21,56 +27,57 @@ const businessTypeOptions = [
 const fieldClassName =
   "h-12 rounded-lg border border-slate-200 bg-white px-4 text-[15px] font-medium text-slate-950 shadow-[0_2px_10px_rgba(15,23,42,0.03)] placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100";
 
-type PasswordFieldProps = {
-  autoComplete: "new-password";
-  id: string;
-  label: string;
-  name: string;
-};
-
-function PasswordField({ autoComplete, id, label, name }: PasswordFieldProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const buttonLabel = isVisible
-    ? `Скрыть ${label.toLowerCase()}`
-    : `Показать ${label.toLowerCase()}`;
-
-  return (
-    <div className="space-y-2.5">
-      <label className="block text-[15px] leading-5 font-bold text-slate-700" htmlFor={id}>
-        {label}
-      </label>
-      <div className="relative">
-        <Input
-          autoComplete={autoComplete}
-          className={cn(fieldClassName, "pr-12", !isVisible && "text-sm")}
-          id={id}
-          minLength={8}
-          name={name}
-          placeholder="••••••••••••••"
-          required
-          type={isVisible ? "text" : "password"}
-        />
-        <button
-          aria-label={buttonLabel}
-          aria-pressed={isVisible}
-          className="absolute top-1/2 right-3 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
-          type="button"
-          onClick={() => setIsVisible((currentValue) => !currentValue)}
-        >
-          <img alt="" className="size-5" src={isVisible ? eyeOffIcon : eyeIcon} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export function RegisterForm() {
   const formId = useId();
+
   const businessNameId = `${formId}-business-name`;
   const businessTypeId = `${formId}-business-type`;
   const emailId = `${formId}-email`;
   const passwordId = `${formId}-password`;
   const passwordConfirmId = `${formId}-password-confirm`;
+
+  const businessNameErrorId = `${businessNameId}-error`;
+  const businessTypeErrorId = `${businessTypeId}-error`;
+  const emailErrorId = `${emailId}-error`;
+  const passwordErrorId = `${passwordId}-error`;
+  const passwordConfirmErrorId = `${passwordConfirmId}-error`;
+
+  const rootErrorId = `${formId}-root-error`;
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      businessName: "",
+      businessType: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    },
+    mode: "onChange",
+  });
+
+  const businessType = useWatch({
+    control,
+    name: "businessType",
+  });
+
+  const onSubmit = async (_values: RegisterFormValues) => {
+    try {
+      // Здесь к примеру будет API request
+      // await register requests later
+    } catch {
+      setError("root", {
+        type: "server",
+        message: "Не удалось создать аккаунт. Попробуйте позже",
+      });
+    }
+  };
 
   return (
     <Card className="w-full rounded-[22px] border border-slate-200/80 bg-white px-6 py-9 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:px-10 sm:py-12 lg:px-20 lg:py-[72px]">
@@ -84,7 +91,7 @@ export function RegisterForm() {
           </p>
         </header>
 
-        <form className="mt-9 space-y-5">
+        <form className="mt-9 space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="space-y-2.5">
             <label
               className="block text-[15px] leading-5 font-bold text-slate-700"
@@ -93,13 +100,16 @@ export function RegisterForm() {
               Название бизнеса
             </label>
             <Input
+              id={businessNameId}
+              {...register("businessName")}
               autoComplete="organization"
               className={fieldClassName}
-              id={businessNameId}
-              name="businessName"
               placeholder="Например, Кофейня на Ленина"
-              required
+              aria-invalid={Boolean(errors.businessName)}
+              aria-describedby={errors.businessName ? businessNameErrorId : undefined}
             />
+
+            <FieldError id={businessNameErrorId} message={errors.businessName?.message} />
           </div>
 
           <div className="space-y-2.5">
@@ -109,29 +119,39 @@ export function RegisterForm() {
             >
               Тип бизнеса
             </label>
+
             <div className="relative">
               <select
+                id={businessTypeId}
+                {...register("businessType")}
                 className={cn(
                   fieldClassName,
-                  "w-full appearance-none pr-12 outline-none invalid:text-slate-400",
+                  "w-full appearance-none pr-12 outline-none",
+                  businessType ? "text-slate-950" : "text-slate-400",
                 )}
-                defaultValue=""
-                id={businessTypeId}
-                name="businessType"
-                required
+                aria-invalid={Boolean(errors.businessType)}
+                aria-describedby={errors.businessType ? businessTypeErrorId : undefined}
               >
                 {businessTypeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
+                  <option
+                    key={option.value}
+                    value={option.value}
+                    disabled={!option.value}
+                    hidden={!option.value}
+                  >
                     {option.label}
                   </option>
                 ))}
               </select>
+
               <ChevronDown
                 aria-hidden="true"
                 className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-slate-400"
                 strokeWidth={2.25}
               />
             </div>
+
+            <FieldError id={businessTypeErrorId} message={errors.businessType?.message} />
           </div>
 
           <div className="space-y-2.5">
@@ -142,33 +162,43 @@ export function RegisterForm() {
               Email
             </label>
             <Input
+              id={emailId}
+              {...register("email")}
+              type="email"
               autoComplete="email"
               className={fieldClassName}
-              id={emailId}
-              name="email"
               placeholder="you@example.com"
-              required
-              type="email"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? emailErrorId : undefined}
             />
+
+            <FieldError id={emailErrorId} message={errors.email?.message} />
           </div>
 
           <PasswordField
-            autoComplete="new-password"
             id={passwordId}
+            autoComplete="new-password"
             label="Пароль"
-            name="password"
+            errorId={passwordErrorId}
+            errorMessage={errors.password?.message}
+            inputProps={register("password")}
           />
 
           <PasswordField
-            autoComplete="new-password"
             id={passwordConfirmId}
+            autoComplete="new-password"
             label="Подтвердите пароль"
-            name="passwordConfirm"
+            errorId={passwordConfirmErrorId}
+            errorMessage={errors.passwordConfirm?.message}
+            inputProps={register("passwordConfirm")}
           />
+
+          <FieldError id={rootErrorId} message={errors.root?.message} />
 
           <Button
             className="mt-2 h-12 w-full rounded-lg bg-violet-600 text-base font-extrabold text-white shadow-[0_14px_30px_rgba(124,58,237,0.24)] hover:bg-violet-700 focus:ring-4 focus:ring-violet-200 focus:outline-none"
             type="submit"
+            disabled={isSubmitting}
           >
             Зарегистрироваться
           </Button>

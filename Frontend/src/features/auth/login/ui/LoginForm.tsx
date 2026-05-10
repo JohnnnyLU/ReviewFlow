@@ -1,12 +1,17 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 import { Link } from "react-router";
 
 import googleIcon from "@/shared/assets/icons/Google_Favicon_2025.svg";
-import eyeOffIcon from "@/shared/assets/icons/eye-off.svg";
-import eyeIcon from "@/shared/assets/icons/eye.svg";
 import { routes } from "@/shared/constants";
-import { cn } from "@/shared/lib";
 import { Button, Card, Input } from "@/shared/ui";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  loginSchema,
+  type LoginFormValues,
+} from "@/features/auth/login/model/loginSchema";
+import { FieldError, PasswordField } from "@/features/auth/ui";
 
 const fieldClassName =
   "h-12 rounded-lg border border-slate-200 bg-white px-4 text-[15px] font-medium text-slate-950 shadow-[0_2px_10px_rgba(15,23,42,0.03)] placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100";
@@ -15,8 +20,36 @@ export function LoginForm() {
   const formId = useId();
   const emailId = `${formId}-email`;
   const passwordId = `${formId}-password`;
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const passwordToggleLabel = isPasswordVisible ? "Скрыть пароль" : "Показать пароль";
+
+  const emailErrorId = `${emailId}-error`;
+  const passwordErrorId = `${passwordId}-error`;
+  const rootErrorId = `${formId}-root-error`;
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onChange",
+  });
+
+  const onSubmit = async (_values: LoginFormValues) => {
+    try {
+      // Здесь к примеру будет API request
+      // await login requests later
+    } catch {
+      setError("root", {
+        type: "server",
+        message: "Неверный email или пароль",
+      });
+    }
+  };
 
   return (
     <Card className="w-full rounded-[22px] border border-slate-200/80 bg-white px-6 py-9 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:px-10 sm:py-12">
@@ -29,54 +62,43 @@ export function LoginForm() {
         </p>
       </header>
 
-      <form className="mt-9 space-y-5">
-        <div className="space-y-2.5">
-          <label className="block text-[15px] leading-5 font-bold text-slate-700" htmlFor={emailId}>
-            Email
-          </label>
-          <Input
-            autoComplete="email"
-            className={fieldClassName}
-            id={emailId}
-            name="email"
-            placeholder="you@example.com"
-            required
-            type="email"
-          />
-        </div>
-
+      <form className="mt-9 space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="space-y-2.5">
           <label
             className="block text-[15px] leading-5 font-bold text-slate-700"
-            htmlFor={passwordId}
+            htmlFor={emailId}
           >
-            Пароль
+            Email
           </label>
-          <div className="relative">
-            <Input
-              autoComplete="current-password"
-              className={cn(fieldClassName, "pr-12", !isPasswordVisible && "text-sm")}
-              id={passwordId}
-              name="password"
-              placeholder="••••••••••••••"
-              required
-              type={isPasswordVisible ? "text" : "password"}
-            />
-            <button
-              aria-label={passwordToggleLabel}
-              aria-pressed={isPasswordVisible}
-              className="absolute top-1/2 right-3 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
-              type="button"
-              onClick={() => setIsPasswordVisible((currentValue) => !currentValue)}
-            >
-              <img alt="" className="size-5" src={isPasswordVisible ? eyeOffIcon : eyeIcon} />
-            </button>
-          </div>
+          <Input
+            id={emailId}
+            {...register("email")}
+            type="email"
+            autoComplete="email"
+            className={fieldClassName}
+            placeholder="you@example.com"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? emailErrorId : undefined}
+          />
+
+          <FieldError id={emailErrorId} message={errors.email?.message} />
         </div>
+
+        <PasswordField
+          id={passwordId}
+          autoComplete="current-password"
+          label="Пароль"
+          errorId={passwordErrorId}
+          errorMessage={errors.password?.message}
+          inputProps={register("password")}
+        />
+
+        <FieldError id={rootErrorId} message={errors.root?.message} />
 
         <Button
           className="mt-2 h-12 w-full rounded-lg bg-violet-600 text-base font-extrabold text-white shadow-[0_14px_30px_rgba(124,58,237,0.24)] hover:bg-violet-700 focus:ring-4 focus:ring-violet-200 focus:outline-none"
           type="submit"
+          disabled={isSubmitting}
         >
           Войти
         </Button>

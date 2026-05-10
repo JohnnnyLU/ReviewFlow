@@ -9,8 +9,8 @@ export function HomePage() {
         <h1 className="text-4xl font-bold tracking-tight text-slate-900">ReviewFlow</h1>
 
         <p className="mt-4 max-w-2xl text-lg text-slate-600">
-          Сервис для сбора честной обратной связи после визита клиента и улучшения качества
-          обслуживания.
+          Сервис для сбора честной обратной связи после визита клиента и улучшения
+          качества обслуживания.
         </p>
 
         <div className="mt-8 flex gap-3">
