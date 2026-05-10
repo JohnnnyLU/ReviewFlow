@@ -6,6 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Business
 
 class BusinessRepository:
+    async def get_by_id(
+            self,
+            session: AsyncSession,
+            business_id: int,
+    ) -> Business | None:
+        result = await session.execute(select(Business).where(Business.id==business_id))
+        return result.scalar_one_or_none()
+
     async def get_by_email(
             self,
             session: AsyncSession,
@@ -29,18 +37,8 @@ class BusinessRepository:
     async def register(
             self,
             session: AsyncSession,
-            business_name: str,
-            email: str,
-            password_hash: str,
+            business: Business,
     ) -> Business:
-        business = Business(
-            business_name=business_name,
-            email=email,
-            password_hash=password_hash,
-            google_id=None,
-            auth_provider="credentials",
-        )
-
         session.add(business)
 
         await session.commit()

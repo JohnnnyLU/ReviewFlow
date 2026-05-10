@@ -1,9 +1,8 @@
-from app.core.config import settings
-
+from fastapi import HTTPException, status
+from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError, ExpiredSignatureError
 
-from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, status
+from app.core.config import settings
 
 class JWTService:
     def __init__(self):
