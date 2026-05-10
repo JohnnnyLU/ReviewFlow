@@ -1,18 +1,15 @@
-from datetime import timedelta, datetime, UTC
-
 from fastapi import HTTPException, status
-from sqlalchemy.exc import IntegrityError
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.schemas import BusinessSchema
 from app.core.security import hash_password, verify_password
 from app.models import Business
-
-from .jwt_service import JWTService
 from app.repositories import BusinessRepository
 from app.schemas import TokenResponse
+
+from .jwt_service import JWTService
 
 
 class AuthService:
@@ -33,7 +30,10 @@ class AuthService:
         business = await self.business_repo.get_by_email(session, email)
 
         if not business or not verify_password(plain_password=password, hashed_password=business.password_hash):
-            raise ValueError('Invalid credentials')
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid credentials',
+            )
 
         payload = {"sub": str(business.id)}
 
@@ -116,11 +116,13 @@ class AuthService:
         business = Business(
             business_name=business_schema.business_name,
             email=business_schema.email,
-            password_hash=password_hash
+            password_hash=password_hash,
+            google_id=None,
+            auth_provider='credentials'
         )
 
         try:
-            return await self.business_repo.create(session, business)
+            return await self.business_repo.register(session, business)
         except IntegrityError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
