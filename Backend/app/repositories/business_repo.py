@@ -23,6 +23,15 @@ class BusinessRepository:
 
         return result.scalar_one_or_none()
 
+    async def get_by_token(
+            self,
+            session: AsyncSession,
+            token: str,
+    ) -> Business | None:
+        result = await session.execute(select(Business).where(Business.token == token))
+
+        return result.scalar_one_or_none()
+
     async def get_by_google_id(
         self,
         session: AsyncSession,
