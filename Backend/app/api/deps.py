@@ -5,8 +5,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database_helper import db_helper
-from app.repositories import BusinessRepository, ReviewRepository
-from app.services import AuthService, JWTService, ReviewService
+from app.repositories import BusinessRepository, ReviewRepository, ProfileRepository
+from app.services import AuthService, JWTService, ReviewService, ProfileService
 
 
 class JWTBearer(HTTPBearer):
@@ -39,6 +39,9 @@ def get_business_repository() -> BusinessRepository:
 def get_review_repository() -> ReviewRepository:
     return ReviewRepository()
 
+def get_profile_repository(session: AsyncSession = Depends(get_db)) -> ProfileRepository:
+    return ProfileRepository(session)
+
 # services
 
 def get_jwt_service() -> JWTService:
@@ -55,6 +58,11 @@ def get_review_service(
     business_repo: BusinessRepository = Depends(get_business_repository),
 ) -> ReviewService:
     return ReviewService(review_repo, business_repo)
+
+def get_profile_service(
+    profile_repo: ProfileRepository = Depends(get_profile_repository),
+) -> ProfileService:
+    return ProfileService(profile_repo)
 
 # JWT
 async def get_current_business(

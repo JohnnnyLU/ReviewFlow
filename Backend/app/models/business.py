@@ -12,6 +12,7 @@ class Business(Base):
     business_name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     password_hash: Mapped[str | None] = mapped_column(String, nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
 
     google_id: Mapped[str | None] = mapped_column(String, unique=True, nullable=True, index=True,)
     auth_provider: Mapped[str] = mapped_column(String(50), default="credentials",)

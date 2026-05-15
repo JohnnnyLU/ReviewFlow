@@ -1,17 +1,14 @@
 from sqlalchemy import (
     Integer,
     String,
-    UUID,
     ForeignKey,
     Enum as SqlEnum,
     DateTime,
     func,
 )
 
-from uuid import uuid4
-
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime, UTC
+from datetime import datetime
 
 from app.core.database_helper import Base
 from app.schemas.review import ReviewSubject

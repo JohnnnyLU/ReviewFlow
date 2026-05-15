@@ -8,7 +8,7 @@ from pydantic import (
 )
 
 class BusinessSchema(BaseModel):
-    business_name:  str = Field(..., min_length=3, max_length=128)
+    business_name: str = Field(..., min_length=3, max_length=128)
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=128)
 
