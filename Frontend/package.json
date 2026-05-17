@@ -5,15 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:checked": "tsc -b && vite build",
     "preview": "vite preview",
+
     "typecheck": "tsc -b --noEmit",
+
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "check": "npm run typecheck && npm run lint && npm run format:check",
-    "ci": "npm run format:check && npm run lint && npm run build"
+
+    "check": "npm run format:check && npm run lint && npm run typecheck",
+    "ci": "npm run check && npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
