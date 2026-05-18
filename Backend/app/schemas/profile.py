@@ -43,9 +43,9 @@ class ProfileResponseSchema(BaseModel):
     business_name: str
     avatar_url: str | None
 
-    google_url: str | None
-    yandex_url: str | None
-    twogis_url: str | None
+    google_review_url: str | None
+    yandex_review_url: str | None
+    twogis_review_url: str | None
 
 class UpdateProfileSchema(BaseModel):
     model_config = ConfigDict(extra='forbid')
@@ -54,7 +54,6 @@ class UpdateProfileSchema(BaseModel):
         default=None,
         min_length=3,
         max_length=128,
-        examples=['username'],
     )
 
     avatar_url: str | None = Field(
@@ -63,17 +62,14 @@ class UpdateProfileSchema(BaseModel):
 
     google_review_url: str | None = Field(
         default=None,
-        examples=['https://maps.google.com/...'],
     )
 
     yandex_review_url: str | None = Field(
         default=None,
-        examples=['https://yandex.ru/maps/...'],
     )
 
     twogis_review_url: str | None = Field(
         default=None,
-        examples=['https://2gis.ru/...'],
     )
 
     @field_validator('avatar_url')

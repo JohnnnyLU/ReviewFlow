@@ -6,9 +6,9 @@ from app.models import Business
 ALLOWED_UPDATE_FIELDS = {
     'business_name',
     'avatar_url',
-    'google_url',
-    'yandex_url',
-    'twogis_url',
+    'google_review_url',
+    'yandex_review_url',
+    'twogis_review_url',
 }
 
 class ProfileRepository:

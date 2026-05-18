@@ -14,7 +14,6 @@ class ProfileService:
 
         update_data = schema.model_dump(
             exclude_unset=True,
-            exclude_none=False
         )
 
         if not update_data:
