@@ -33,8 +33,8 @@ async def get_db():
 
 # repositories
 
-def get_business_repository() -> BusinessRepository:
-    return BusinessRepository()
+def get_business_repository(session: AsyncSession = Depends(get_db)) -> BusinessRepository:
+    return BusinessRepository(session)
 
 def get_review_repository() -> ReviewRepository:
     return ReviewRepository()
@@ -61,13 +61,13 @@ def get_review_service(
 
 def get_profile_service(
     profile_repo: ProfileRepository = Depends(get_profile_repository),
+    business_repo: BusinessRepository = Depends(get_business_repository)
 ) -> ProfileService:
-    return ProfileService(profile_repo)
+    return ProfileService(profile_repo, business_repo)
 
 # JWT
 async def get_current_business(
     token: str = Depends(oauth2_scheme),
-    session: AsyncSession = Depends(get_db),
     jwt_service: JWTService = Depends(get_jwt_service),
     repo: BusinessRepository = Depends(get_business_repository),
 ):
@@ -75,7 +75,7 @@ async def get_current_business(
 
     business_id = payload.get("sub")
 
-    business = await repo.get_by_id(session, int(business_id))
+    business = await repo.get_by_id(int(business_id))
 
     if not business:
         raise HTTPException(

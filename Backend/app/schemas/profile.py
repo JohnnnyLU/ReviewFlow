@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field, field_validator, EmailStr, ConfigDict
 
 
 ALLOWED_DOMAINS = {
-    'google.com/maps',
+    'google.com',
     'maps.google.com',
-    'yandex.ru/maps',
+    'yandex.ru',
     'maps.yandex.ru',
     '2gis.ru',
     'maps.2gis.ru',
@@ -41,6 +41,7 @@ def validate_regular_url(v: str) -> str:
 class ProfileResponseSchema(BaseModel):
     id: int
     business_name: str
+    token: str
     avatar_url: str | None
 
     google_review_url: str | None

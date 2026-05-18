@@ -6,58 +6,55 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Business
 
 class BusinessRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
     async def get_by_id(
             self,
-            session: AsyncSession,
             business_id: int,
     ) -> Business | None:
-        result = await session.execute(select(Business).where(Business.id==business_id))
+        result = await self.session.execute(select(Business).where(Business.id==business_id))
         return result.scalar_one_or_none()
 
     async def get_by_email(
             self,
-            session: AsyncSession,
             email: str,
     ) -> Business | None:
-        result = await session.execute(select(Business).where(Business.email == email))
+        result = await self.session.execute(select(Business).where(Business.email == email))
 
         return result.scalar_one_or_none()
 
     async def get_by_token(
             self,
-            session: AsyncSession,
             token: str,
     ) -> Business | None:
-        result = await session.execute(select(Business).where(Business.token == token))
+        result = await self.session.execute(select(Business).where(Business.token == token))
 
         return result.scalar_one_or_none()
 
     async def get_by_google_id(
         self,
-        session: AsyncSession,
         google_id: str,
     ):
         query = select(Business).where(Business.google_id == google_id)
 
-        result = await session.execute(query)
+        result = await self.session.execute(query)
 
         return result.scalar_one_or_none()
 
     async def register(
             self,
-            session: AsyncSession,
             business: Business,
     ) -> Business:
-        session.add(business)
+        self.session.add(business)
 
-        await session.commit()
-        await session.refresh(business)
+        await self.session.commit()
+        await self.session.refresh(business)
 
         return business
 
     async def create_google_user(
         self,
-        session: AsyncSession,
         email: str,
         google_id: str,
         business_name: str,
@@ -69,9 +66,9 @@ class BusinessRepository:
             auth_provider="google",
         )
 
-        session.add(business)
+        self.session.add(business)
 
-        await session.commit()
-        await session.refresh(business)
+        await self.session.commit()
+        await self.session.refresh(business)
 
         return business
